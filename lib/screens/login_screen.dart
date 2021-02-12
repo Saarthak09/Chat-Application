@@ -1,3 +1,7 @@
+import 'dart:html';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
@@ -9,6 +13,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+  String email;
+  String password;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Hero(
-              tag:'logo',
+              tag: 'logo',
               child: Container(
                 height: 200.0,
                 child: Image.asset('images/logo.png'),
@@ -30,20 +37,24 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 48.0,
             ),
             TextField(
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration: kTextFieldDecoration.copyWith(hintText: 'Enter your email')
-            ),
+                keyboardType: TextInputType.emailAddress,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  email = value;
+                },
+                decoration: kTextFieldDecoration.copyWith(
+                    hintText: 'Enter your email')),
             SizedBox(
               height: 8.0,
             ),
             TextField(
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-              decoration: kTextFieldDecoration.copyWith(hintText: 'Enter your password')
-            ),
+                obscureText: true,
+                textAlign: TextAlign.center,
+                onChanged: (value) {
+                  password = password;
+                },
+                decoration: kTextFieldDecoration.copyWith(
+                    hintText: 'Enter your password')),
             SizedBox(
               height: 24.0,
             ),
@@ -54,8 +65,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(30.0)),
                 elevation: 5.0,
                 child: MaterialButton(
-                  onPressed: () {
-                    //Implement login functionality.
+                  onPressed: () async {
+                    try {
+                      final user = await _auth.signInWithEmailAndPassword(
+                          email: email, password: password);
+                      if (user != null) {
+                        Navigator.pushNamed(context, ChatScreen.id);
+                      }
+                    } catch (e) {
+                      print(e);
+                    }
                   },
                   minWidth: 200.0,
                   height: 42.0,
